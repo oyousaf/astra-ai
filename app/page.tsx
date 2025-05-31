@@ -7,8 +7,8 @@ export default function HomePage() {
       <Image
         src="/logo.svg"
         alt="Astra AI Logo"
-        width={100}
-        height={28}
+        width={300}
+        height={150}
         className="mb-6 drop-shadow-lg"
       />
       <h1 className="text-5xl font-extrabold mb-3 text-center">

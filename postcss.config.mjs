@@ -1,12 +1,6 @@
-const config = {
-  theme: {
-    extend: {
-      fontFamily: {
-        quirky: ["Quicksand", "sans-serif"],
-      },
-    },
+export default {
+  plugins: {
+    "@tailwindcss/postcss": {},
+    autoprefixer: {},
   },
-  plugins: ["@tailwindcss/postcss"],
 };
-
-export default config;
