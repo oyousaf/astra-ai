@@ -27,9 +27,12 @@ export default function RegisterPage() {
         err &&
         typeof err === "object" &&
         "response" in err &&
-        (err as any).response?.data?.error
+        (err as { response?: { data?: { error?: string } } }).response?.data
+          ?.error
       ) {
-        setError((err as any).response.data.error);
+        setError(
+          (err as { response: { data: { error: string } } }).response.data.error
+        );
       } else {
         setError("Registration failed");
       }

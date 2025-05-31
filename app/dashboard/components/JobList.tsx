@@ -13,9 +13,7 @@ import {
 import JobModal from "./JobModal";
 import { Job } from "@/types";
 import { toast } from "sonner";
-
 import { fetchJobs, createJob, updateJob, deleteJob } from "../../lib/api";
-
 import { useAuth } from "../../context/AuthContext";
 
 export default function JobList() {
@@ -56,9 +54,13 @@ export default function JobList() {
         error &&
         typeof error === "object" &&
         "response" in error &&
-        (error as any).response?.data?.message
+        (error as { response?: { data?: { message?: string } } }).response?.data
+          ?.message
       ) {
-        toast.error((error as any).response.data.message);
+        toast.error(
+          (error as { response: { data: { message: string } } }).response.data
+            .message
+        );
       } else {
         toast.error("Failed to add job");
       }
