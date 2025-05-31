@@ -9,7 +9,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: ["https://astra-ai-six.vercel.app/"],
     credentials: true,
   })
 );
