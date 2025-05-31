@@ -7,17 +7,12 @@ import { authenticate } from './middleware/auth.js';
 
 const app = express();
 
-console.log('CORS_ORIGIN:', process.env.CORS_ORIGIN);
-
-const corsOptions = {
-  origin: process.env.CORS_ORIGIN
-    ? process.env.CORS_ORIGIN.split(',')
-    : false,
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",") : false,
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.use('/auth', authRouter);
