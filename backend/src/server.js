@@ -9,11 +9,12 @@ const app = express();
 
 app.use(
   cors({
-    origin: ['https://astra-ai-six.vercel.app/', 'localhost:3000'],
+    origin: process.env.CORS_ORIGIN
+      ? process.env.CORS_ORIGIN.split(',')
+      : false,
     credentials: true,
   })
 );
-
 app.use(express.json());
 
 app.use('/auth', authRouter);
