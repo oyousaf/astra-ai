@@ -51,8 +51,17 @@ export default function JobList() {
       const res = await createJob(token, payload);
       setJobs((prev) => [res.data, ...prev]);
       toast.success("🎉 Job added!");
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to add job");
+    } catch (error: unknown) {
+      if (
+        error &&
+        typeof error === "object" &&
+        "response" in error &&
+        (error as any).response?.data?.message
+      ) {
+        toast.error((error as any).response.data.message);
+      } else {
+        toast.error("Failed to add job");
+      }
       console.error("Add job error:", error);
     }
   };

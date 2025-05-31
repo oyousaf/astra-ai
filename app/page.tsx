@@ -1,12 +1,15 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function HomePage() {
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-[#d8b4fe] via-accent/40 to-[#facc15]/20">
-      <img
+      <Image
         src="/logo.svg"
         alt="Astra AI Logo"
-        className="w-100 h-28 mb-6 drop-shadow-lg"
+        width={100}
+        height={28}
+        className="mb-6 drop-shadow-lg"
       />
       <h1 className="text-5xl font-extrabold mb-3 text-center">
         Track Every Application.
