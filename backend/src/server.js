@@ -9,7 +9,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["https://astra-ai-six.vercel.app/"],
+    origin: ['https://astra-ai-six.vercel.app/', 'localhost:3000'],
     credentials: true,
   })
 );
@@ -18,7 +18,6 @@ app.use(express.json());
 
 app.use('/auth', authRouter);
 app.use('/jobs', authenticate, jobsRouter);
-
 
 app.get('/', (req, res) => {
   res.send('Welcome to Astra AI Backend!');
