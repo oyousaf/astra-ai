@@ -1,0 +1,7 @@
+<svg width="180" height="50" viewBox="0 0 180 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <text x="8" y="34" font-family="Montserrat, sans-serif" font-size="34" font-weight="bold" fill="#5b21b6">Astra</text>
+  <text x="90" y="34" font-family="Montserrat, sans-serif" font-size="34" font-weight="bold" fill="#ff80b5">AI</text>
+  <circle cx="150" cy="20" r="10" fill="#facc15"></circle>
+  <path d="M160 20 L175 10 L165 27 Z" fill="#7c3aed"></path>
+  <circle cx="175" cy="10" r="3" fill="#ff80b5"></circle>
+</svg>
