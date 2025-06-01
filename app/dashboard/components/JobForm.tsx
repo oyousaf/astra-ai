@@ -141,7 +141,7 @@ export default function JobForm({
             dateFormat="dd-MM-yyyy"
             className="input-style text-center"
             placeholderText="Select date"
-            wrapperClassName="w-full"
+            wrapperClassName="w-full react-datepicker-wrapper"
             required
             maxDate={new Date()}
           />
