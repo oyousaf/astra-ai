@@ -101,27 +101,54 @@ export default function JobModal({
           ) : (
             <>
               <h2 className="text-light text-xl font-bold mb-4">Edit Job</h2>
+              <label
+                htmlFor="title"
+                className="block text-light font-semibold mb-1"
+              >
+                Job Title:
+              </label>
               <input
-                type="text"
+                id="title"
                 name="title"
+                type="text"
+                autoComplete="off"
                 value={formData?.title || ""}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 className="bg-light text-primary w-full mb-3 px-3 py-2 border rounded text-center"
                 placeholder="Job Title"
               />
+
+              <label
+                htmlFor="company"
+                className="block text-light font-semibold mb-1"
+              >
+                Company Name:
+              </label>
               <input
-                type="text"
+                id="company"
                 name="company"
+                type="text"
+                autoComplete="organization"
                 value={formData?.company || ""}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 className="bg-light text-primary w-full mb-3 px-3 py-2 border rounded text-center"
                 placeholder="Company Name"
               />
+
+              <label
+                htmlFor="status"
+                className="block text-light font-semibold mb-1"
+              >
+                Status:
+              </label>
               <Select
                 value={formData?.status || ""}
                 onValueChange={(value) => handleChange("status", value)}
               >
-                <SelectTrigger className="w-full mb-3 bg-light text-primary border rounded px-3 py-2 justify-center">
+                <SelectTrigger
+                  id="status"
+                  className="w-full mb-3 bg-light text-primary border rounded px-3 py-2 justify-center"
+                >
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent className="bg-light text-primary rounded-xl shadow-xl">
@@ -132,12 +159,17 @@ export default function JobModal({
                 </SelectContent>
               </Select>
 
-              <label className="block text-light font-semibold mb-1 ">
+              <label
+                htmlFor="appliedDate"
+                className="block text-light font-semibold mb-1 "
+              >
                 Date Applied:
               </label>
               <input
-                type="date"
+                id="appliedDate"
                 name="appliedDate"
+                type="date"
+                autoComplete="date"
                 value={
                   formData?.appliedDate
                     ? new Date(formData.appliedDate).toISOString().slice(0, 10)
@@ -147,11 +179,16 @@ export default function JobModal({
                 className="bg-light text-primary w-full mb-3 px-3 py-2 border rounded"
               />
 
-              <label className="block text-light font-semibold mb-1">
+              <label
+                htmlFor="notes"
+                className="block text-light font-semibold mb-1"
+              >
                 Notes:
               </label>
               <textarea
+                id="notes"
                 name="notes"
+                autoComplete="off"
                 value={formData?.notes || ""}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 className="bg-light text-primary w-full mb-3 px-3 py-2 border rounded resize-y min-h-[80px] text-center"

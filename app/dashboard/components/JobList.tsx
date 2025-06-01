@@ -20,7 +20,7 @@ export default function JobList() {
   const { token } = useAuth();
 
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [filter, setFilter] = useState<string>("All");
+  const [filter, setFilter] = useState<Job["status"] | "All">("All");
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(false);
@@ -30,13 +30,15 @@ export default function JobList() {
     setLoading(true);
     fetchJobs(token)
       .then((res) => setJobs(res.data))
-      .catch(() => toast.error("Failed to load jobs"))
+      .catch(() => {
+        toast.error("Failed to load jobs");
+        setJobs([]); // Clear jobs if error
+      })
       .finally(() => setLoading(false));
   }, [token]);
 
   const handleAdd = async (job: Job) => {
     if (!token) return;
-
     try {
       const payload = {
         title: job.title,
@@ -45,7 +47,6 @@ export default function JobList() {
         notes: job.notes,
         appliedDate: new Date(job.appliedDate).toISOString(),
       };
-
       const res = await createJob(token, payload);
       setJobs((prev) => [res.data, ...prev]);
       toast.success("🎉 Job added!");
@@ -105,9 +106,12 @@ export default function JobList() {
     <div className="space-y-6 font-quirky">
       <JobForm onAdd={handleAdd} />
 
-      <div className="flex items-center gap-4 bg-light px-4 py-2 rounded-xl text-center justify-center">
+      <div
+        className="flex items-center gap-4 bg-light px-4 py-2 rounded-xl text-center justify-center"
+        aria-label="Job status filter"
+      >
         <span className="font-semibold text-primary">Filter by status:</span>
-        <Select onValueChange={setFilter}>
+        <Select value={filter} onValueChange={setFilter}>
           <SelectTrigger className="w-[180px] border-primary focus:ring-accent">
             <SelectValue placeholder="All" />
           </SelectTrigger>

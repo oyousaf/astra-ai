@@ -70,7 +70,7 @@ export default function JobForm({
     } else if (onAdd) {
       onAdd(newJob);
     }
-    
+
     if (!jobToEdit) {
       setTitle("");
       setCompany("");
@@ -82,6 +82,9 @@ export default function JobForm({
 
   return (
     <motion.form
+      id="job-form"
+      name="job-form"
+      autoComplete="on"
       onSubmit={handleSubmit}
       initial={{ opacity: 0, y: -12 }}
       animate={{ opacity: 1, y: 0 }}
@@ -90,16 +93,22 @@ export default function JobForm({
     >
       <div className="grid gap-4 md:grid-cols-5 sm:grid-cols-3 items-center text-center justify-center">
         <input
+          id="job-title"
+          name="job-title"
           type="text"
           placeholder="Job Title"
+          autoComplete="off"
           className="input-style text-center"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
         />
         <input
+          id="company"
+          name="company"
           type="text"
           placeholder="Company"
+          autoComplete="organization"
           className="input-style text-center"
           value={company}
           onChange={(e) => setCompany(e.target.value)}
@@ -119,12 +128,14 @@ export default function JobForm({
         </Select>
 
         <div className="flex flex-col items-center gap-1">
-          <label htmlFor="appliedDate" className="text-primary font-semibold">
+          <label htmlFor="applied-date" className="text-primary font-semibold">
             Applied on:
           </label>
           <input
-            id="appliedDate"
+            id="applied-date"
+            name="applied-date"
             type="date"
+            autoComplete="date"
             value={appliedDate}
             onChange={(e) => setAppliedDate(e.target.value)}
             className="input-style text-center"
@@ -133,7 +144,10 @@ export default function JobForm({
         </div>
 
         <textarea
+          id="notes"
+          name="notes"
           placeholder="Notes (optional)"
+          autoComplete="off"
           className="input-style mt-4 w-full text-center"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
