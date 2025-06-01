@@ -44,14 +44,20 @@ export default function RegisterPage() {
 
   return (
     <AuthLayout>
-      <form onSubmit={handleSubmit} className="space-y-5 text-primary">
+      <form
+        name="register"
+        onSubmit={handleSubmit}
+        className="space-y-5 text-primary"
+      >
         <h2 className="text-2xl font-bold text-center">📝 Register</h2>
 
         {error && <p className="text-red-800 text-sm text-center">{error}</p>}
 
         <input
+          name="email"
           type="email"
           placeholder="Email"
+          autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -60,8 +66,10 @@ export default function RegisterPage() {
 
         <div className="relative">
           <input
+            name="password"
             type={showPassword ? "text" : "password"}
             placeholder="Password"
+            autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
