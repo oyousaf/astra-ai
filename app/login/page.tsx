@@ -5,6 +5,7 @@ import { loginUser } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import AuthLayout from "../components/AuthLayout";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -14,16 +15,27 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setLoading(true);
     try {
       const res = await loginUser(email, password);
       login(res.data.token);
+      toast.success("🎉 Welcome back!");
       router.push("/dashboard");
-    } catch {
-      setError("Invalid credentials");
+    } catch (err: unknown) {
+      let message = "Login failed";
+      if (typeof err === "object" && err && "response" in err) {
+        const response = (err as any).response;
+        if (response?.data?.error) message = response.data.error;
+      }
+      toast.error(message);
+      setError(message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -63,9 +75,10 @@ export default function LoginPage() {
 
         <button
           type="submit"
+          disabled={loading}
           className="w-full bg-primary text-accent py-2 rounded-xl hover:scale-105 transition-all cursor-pointer"
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
         <p className="mt-4 text-sm text-center">
           Don&apos;t have an account?{" "}

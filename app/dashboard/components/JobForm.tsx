@@ -69,9 +69,8 @@ export default function JobForm({
       if (onCancelEdit) onCancelEdit();
     } else if (onAdd) {
       onAdd(newJob);
-      toast.success("🎉 Job added!");
     }
-
+    
     if (!jobToEdit) {
       setTitle("");
       setCompany("");

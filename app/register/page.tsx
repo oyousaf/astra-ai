@@ -5,6 +5,7 @@ import { registerUser } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import AuthLayout from "../components/AuthLayout";
+import { toast } from "sonner";
 
 export default function RegisterPage() {
   const { login } = useAuth();
@@ -14,13 +15,16 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setLoading(true);
     try {
       const res = await registerUser(email, password);
       login(res.data.token);
+      toast.success("🎉 Registration successful! Welcome aboard!");
       router.push("/dashboard");
     } catch (err: unknown) {
       if (
@@ -33,9 +37,15 @@ export default function RegisterPage() {
         setError(
           (err as { response: { data: { error: string } } }).response.data.error
         );
+        toast.error(
+          (err as { response: { data: { error: string } } }).response.data.error
+        );
       } else {
         setError("Registration failed");
+        toast.error("Registration failed");
       }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -68,6 +78,7 @@ export default function RegisterPage() {
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-2 text-sm text-primary underline cursor-pointer"
+            tabIndex={-1}
           >
             {showPassword ? "Hide" : "Show"}
           </button>
@@ -75,9 +86,12 @@ export default function RegisterPage() {
 
         <button
           type="submit"
-          className="w-full bg-green-600 text-white py-2 rounded-xl hover:scale-105 transition-all cursor-pointer"
+          disabled={loading}
+          className={`w-full bg-green-600 text-white py-2 rounded-xl hover:scale-105 transition-all cursor-pointer ${
+            loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
         >
-          Register
+          {loading ? "Registering…" : "Register"}
         </button>
         <p className="mt-4 text-sm text-center">
           Already have an account?{" "}
