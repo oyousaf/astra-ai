@@ -67,7 +67,7 @@ export default function JobCard({ job, onEdit, onDelete }: JobCardProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.3 }}
-      className={`${styles.card} ${styles.border} border-l-6 p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-between select-none relative`}
+      className={`${styles.card} ${styles.border} border-l-6 p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col text-center justify-between select-none relative `}
       aria-label={`Job card for ${job.title} at ${job.company}`}
     >
       <div className="space-y-1">
