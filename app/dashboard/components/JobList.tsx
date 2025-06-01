@@ -49,7 +49,6 @@ export default function JobList() {
       };
       const res = await createJob(token, payload);
       setJobs((prev) => [res.data, ...prev]);
-      toast.success("🎉 Job added!");
     } catch (error: unknown) {
       if (
         error &&
