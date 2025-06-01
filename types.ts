@@ -6,3 +6,11 @@ export type Job = {
   appliedDate: string;
   notes?: string;
 };
+
+export type ApiError = {
+  response?: {
+    data?: {
+      error?: string;
+    };
+  };
+};

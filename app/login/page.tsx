@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import AuthLayout from "../components/AuthLayout";
 import { toast } from "sonner";
+import { ApiError } from "@/types";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -28,12 +29,16 @@ export default function LoginPage() {
       router.push("/dashboard");
     } catch (err: unknown) {
       let message = "Login failed";
-      if (typeof err === "object" && err && "response" in err) {
-        const response = (err as any).response;
-        if (response?.data?.error) message = response.data.error;
+      if (
+        err &&
+        typeof err === "object" &&
+        "response" in err &&
+        (err as ApiError).response?.data?.error
+      ) {
+        message = (err as ApiError).response!.data!.error!;
       }
-      toast.error(message);
       setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -68,6 +73,7 @@ export default function LoginPage() {
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-2 text-sm text-primary underline cursor-pointer"
+            tabIndex={-1}
           >
             {showPassword ? "Hide" : "Show"}
           </button>
@@ -76,7 +82,9 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-primary text-accent py-2 rounded-xl hover:scale-105 transition-all cursor-pointer"
+          className={`w-full bg-primary text-accent py-2 rounded-xl hover:scale-105 transition-all cursor-pointer ${
+            loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
         >
           {loading ? "Logging in..." : "Login"}
         </button>

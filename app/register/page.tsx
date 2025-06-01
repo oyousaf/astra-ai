@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import AuthLayout from "../components/AuthLayout";
 import { toast } from "sonner";
+import { ApiError } from "@/types";
 
 export default function RegisterPage() {
   const { login } = useAuth();
@@ -27,22 +28,19 @@ export default function RegisterPage() {
       toast.success("🎉 Registration successful! Welcome aboard!");
       router.push("/dashboard");
     } catch (err: unknown) {
+      let message = "Registration failed";
       if (
         err &&
         typeof err === "object" &&
         "response" in err &&
-        (err as { response?: { data?: { error?: string } } }).response?.data
-          ?.error
+        (err as ApiError).response?.data?.error
       ) {
-        setError(
-          (err as { response: { data: { error: string } } }).response.data.error
-        );
-        toast.error(
-          (err as { response: { data: { error: string } } }).response.data.error
-        );
+        const apiError = err as ApiError;
+        setError(apiError.response!.data!.error!);
+        toast.error(apiError.response!.data!.error!);
       } else {
-        setError("Registration failed");
-        toast.error("Registration failed");
+        setError(message);
+        toast.error(message);
       }
     } finally {
       setLoading(false);
