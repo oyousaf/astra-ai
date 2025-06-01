@@ -115,7 +115,7 @@ export default function JobForm({
           required
         />
 
-        <Select value={status} onValueChange={setStatus}>
+        <Select value={status} onValueChange={setStatus} name="status">
           <SelectTrigger className="w-full border-primary focus:ring-accent bg-light rounded-xl justify-center">
             <SelectValue placeholder="Select status" />
           </SelectTrigger>
