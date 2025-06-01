@@ -28,20 +28,15 @@ export default function RegisterPage() {
       toast.success("🎉 Registration successful! Welcome aboard!");
       router.push("/dashboard");
     } catch (err: unknown) {
-      let message = "Registration failed";
-      if (
+      const message =
         err &&
         typeof err === "object" &&
         "response" in err &&
         (err as ApiError).response?.data?.error
-      ) {
-        const apiError = err as ApiError;
-        setError(apiError.response!.data!.error!);
-        toast.error(apiError.response!.data!.error!);
-      } else {
-        setError(message);
-        toast.error(message);
-      }
+          ? (err as ApiError).response!.data!.error!
+          : "Registration failed";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

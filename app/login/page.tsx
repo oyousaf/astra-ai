@@ -28,15 +28,13 @@ export default function LoginPage() {
       toast.success("🎉 Welcome back!");
       router.push("/dashboard");
     } catch (err: unknown) {
-      let message = "Login failed";
-      if (
+      const message =
         err &&
         typeof err === "object" &&
         "response" in err &&
         (err as ApiError).response?.data?.error
-      ) {
-        message = (err as ApiError).response!.data!.error!;
-      }
+          ? (err as ApiError).response!.data!.error!
+          : "Login failed";
       setError(message);
       toast.error(message);
     } finally {
