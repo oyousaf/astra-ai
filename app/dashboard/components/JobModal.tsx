@@ -197,7 +197,6 @@ export default function JobModal({
                   placeholderText="Select date"
                   dateFormat="dd-MM-yyyy"
                   wrapperClassName="w-full"
-                  showPopperArrow={false}
                   maxDate={new Date()}
                 />
               </div>

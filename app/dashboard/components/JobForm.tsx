@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Job } from "@/types";
@@ -16,40 +16,14 @@ import "react-datepicker/dist/react-datepicker.css";
 
 type Props = {
   onAdd?: (job: Job) => void;
-  onUpdate?: (job: Job) => void;
-  jobToEdit?: Job | null;
-  onCancelEdit?: () => void;
 };
 
-export default function JobForm({
-  onAdd,
-  onUpdate,
-  jobToEdit,
-  onCancelEdit,
-}: Props) {
+export default function JobForm({ onAdd }: Props) {
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
   const [status, setStatus] = useState("Applied");
   const [appliedDate, setAppliedDate] = useState<Date | null>(new Date());
   const [notes, setNotes] = useState("");
-
-  useEffect(() => {
-    if (jobToEdit) {
-      setTitle(jobToEdit.title);
-      setCompany(jobToEdit.company);
-      setStatus(jobToEdit.status);
-      setAppliedDate(
-        jobToEdit.appliedDate ? new Date(jobToEdit.appliedDate) : new Date()
-      );
-      setNotes(jobToEdit.notes || "");
-    } else {
-      setTitle("");
-      setCompany("");
-      setStatus("Applied");
-      setAppliedDate(new Date());
-      setNotes("");
-    }
-  }, [jobToEdit]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +35,7 @@ export default function JobForm({
     const isoDate = appliedDate.toISOString().split("T")[0];
 
     const newJob: Job = {
-      id: jobToEdit ? jobToEdit.id : Date.now(),
+      id: Date.now(),
       title,
       company,
       status,
@@ -69,21 +43,16 @@ export default function JobForm({
       notes: notes.trim() ? notes : undefined,
     };
 
-    if (jobToEdit && onUpdate) {
-      onUpdate(newJob);
-      toast.success("✨ Job updated!");
-      if (onCancelEdit) onCancelEdit();
-    } else if (onAdd) {
+    if (onAdd) {
       onAdd(newJob);
+      toast.success("✨ Job added!");
     }
 
-    if (!jobToEdit) {
-      setTitle("");
-      setCompany("");
-      setStatus("Applied");
-      setAppliedDate(new Date());
-      setNotes("");
-    }
+    setTitle("");
+    setCompany("");
+    setStatus("Applied");
+    setAppliedDate(new Date());
+    setNotes("");
   };
 
   return (
@@ -133,7 +102,7 @@ export default function JobForm({
           </SelectContent>
         </Select>
 
-        <div className="flex flex-col items-center gap-1">
+        <div className="flex flex-col items-center gap-1 z-10">
           <DatePicker
             id="applied-date"
             selected={appliedDate}
@@ -141,7 +110,8 @@ export default function JobForm({
             dateFormat="dd-MM-yyyy"
             className="input-style text-center"
             placeholderText="Select date"
-            wrapperClassName="w-full react-datepicker-wrapper"
+            portalId="datepicker-portal"
+            wrapperClassName="w-full"
             required
             maxDate={new Date()}
           />
@@ -168,18 +138,8 @@ export default function JobForm({
           type="submit"
           className="px-5 py-2 bg-primary text-accent rounded-xl shadow-md hover:bg-primary transition-all duration-200 cursor-pointer"
         >
-          {jobToEdit ? "🛠 Update Job" : "➕ Add Job"}
+          ➕ Add Job
         </button>
-
-        {jobToEdit && (
-          <button
-            type="button"
-            onClick={onCancelEdit}
-            className="px-5 py-2 bg-gray-300 text-gray-800 rounded-xl hover:bg-gray-400 transition cursor-pointer"
-          >
-            Cancel
-          </button>
-        )}
       </motion.div>
     </motion.form>
   );

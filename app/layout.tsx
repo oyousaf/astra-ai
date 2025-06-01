@@ -18,6 +18,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="bg-primary text-primary">
         <AuthProvider>{children}</AuthProvider>
         <Toaster richColors position="top-right" />
+        <div id="datepicker-portal"></div>
       </body>
     </html>
   );
