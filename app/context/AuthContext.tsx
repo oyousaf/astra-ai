@@ -12,41 +12,39 @@ interface AuthContextType {
   token: string | null;
   login: (token: string) => void;
   logout: () => void;
+  isLoaded: boolean; 
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  // Mark when we're on client to safely access localStorage
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    if (isClient) {
+    if (typeof window !== "undefined") {
       const storedToken = localStorage.getItem("token");
       if (storedToken) setToken(storedToken);
+      setIsLoaded(true);
     }
-  }, [isClient]);
+  }, []);
 
-  // Sync localStorage whenever token changes and we're on client
-  useEffect(() => {
-    if (!isClient) return;
-    if (token) {
-      localStorage.setItem("token", token);
-    } else {
+  const login = (newToken: string) => {
+    setToken(newToken);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("token", newToken);
+    }
+  };
+
+  const logout = () => {
+    setToken(null);
+    if (typeof window !== "undefined") {
       localStorage.removeItem("token");
     }
-  }, [token, isClient]);
-
-  const login = (newToken: string) => setToken(newToken);
-  const logout = () => setToken(null);
+  };
 
   return (
-    <AuthContext.Provider value={{ token, login, logout }}>
+    <AuthContext.Provider value={{ token, login, logout, isLoaded }}>
       {children}
     </AuthContext.Provider>
   );

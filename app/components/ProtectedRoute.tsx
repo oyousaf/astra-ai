@@ -9,18 +9,17 @@ export default function ProtectedRoute({
 }: {
   children: React.ReactNode;
 }) {
-  const { token } = useAuth();
+  const { token, isLoaded } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!token) {
+    if (isLoaded && !token) {
       router.replace("/login");
     }
-  }, [token, router]);
+  }, [token, isLoaded, router]);
 
-  if (!token) {
-    return null;
-  }
+  if (!isLoaded) return null;
+  if (!token) return null;
 
   return <>{children}</>;
 }
