@@ -32,7 +32,7 @@ export default function JobList() {
       .then((res) => setJobs(res.data))
       .catch(() => {
         toast.error("Failed to load jobs");
-        setJobs([]); // Clear jobs if error
+        setJobs([]);
       })
       .finally(() => setLoading(false));
   }, [token]);
