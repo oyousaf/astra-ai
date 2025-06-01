@@ -11,6 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 type Props = {
   onAdd?: (job: Job) => void;
@@ -28,7 +30,7 @@ export default function JobForm({
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
   const [status, setStatus] = useState("Applied");
-  const [appliedDate, setAppliedDate] = useState("");
+  const [appliedDate, setAppliedDate] = useState<Date | null>(new Date());
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
@@ -36,13 +38,15 @@ export default function JobForm({
       setTitle(jobToEdit.title);
       setCompany(jobToEdit.company);
       setStatus(jobToEdit.status);
-      setAppliedDate(jobToEdit.appliedDate.slice(0, 10));
+      setAppliedDate(
+        jobToEdit.appliedDate ? new Date(jobToEdit.appliedDate) : new Date()
+      );
       setNotes(jobToEdit.notes || "");
     } else {
       setTitle("");
       setCompany("");
       setStatus("Applied");
-      setAppliedDate(new Date().toISOString().split("T")[0]);
+      setAppliedDate(new Date());
       setNotes("");
     }
   }, [jobToEdit]);
@@ -54,12 +58,14 @@ export default function JobForm({
       return;
     }
 
+    const isoDate = appliedDate.toISOString().split("T")[0];
+
     const newJob: Job = {
       id: jobToEdit ? jobToEdit.id : Date.now(),
       title,
       company,
       status,
-      appliedDate,
+      appliedDate: isoDate,
       notes: notes.trim() ? notes : undefined,
     };
 
@@ -75,7 +81,7 @@ export default function JobForm({
       setTitle("");
       setCompany("");
       setStatus("Applied");
-      setAppliedDate(new Date().toISOString().split("T")[0]);
+      setAppliedDate(new Date());
       setNotes("");
     }
   };
@@ -128,18 +134,16 @@ export default function JobForm({
         </Select>
 
         <div className="flex flex-col items-center gap-1">
-          <label htmlFor="applied-date" className="text-primary font-semibold">
-            Applied on:
-          </label>
-          <input
+          <DatePicker
             id="applied-date"
-            name="applied-date"
-            type="date"
-            autoComplete="date"
-            value={appliedDate}
-            onChange={(e) => setAppliedDate(e.target.value)}
+            selected={appliedDate}
+            onChange={(date) => setAppliedDate(date)}
+            dateFormat="dd-MM-yyyy"
             className="input-style text-center"
+            placeholderText="Select date"
+            wrapperClassName="w-full"
             required
+            maxDate={new Date()}
           />
         </div>
 

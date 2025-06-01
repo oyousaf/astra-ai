@@ -10,17 +10,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 type JobModalProps = {
   isOpen: boolean;
   onClose: () => void;
   job: Job | null;
   onUpdate: (job: Job) => void;
-  isEditing: boolean;
   onDelete: (id: number) => void;
+  isEditing: boolean;
 };
 
-const formatDate = (date: string | Date) =>
+const parseDate = (date: string | Date | undefined): Date | null =>
+  date ? new Date(date) : null;
+
+const formatDate = (date: string | Date | undefined) =>
   date ? new Date(date).toLocaleDateString() : "";
 
 export default function JobModal({
@@ -49,7 +54,7 @@ export default function JobModal({
     if ((e.target as HTMLElement).id === "modal-backdrop") onClose();
   };
 
-  const handleChange = (name: string, value: string) => {
+  const handleChange = (name: string, value: string | Date) => {
     if (!formData) return;
     setFormData({ ...formData, [name]: value });
   };
@@ -178,19 +183,24 @@ export default function JobModal({
               >
                 Date Applied:
               </label>
-              <input
-                id="appliedDate"
-                name="appliedDate"
-                type="date"
-                autoComplete="date"
-                value={
-                  formData?.appliedDate
-                    ? new Date(formData.appliedDate).toISOString().slice(0, 10)
-                    : ""
-                }
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
-                className="bg-light text-primary w-full mb-3 px-3 py-2 border rounded text-center"
-              />
+              <div className="flex w-full mb-3">
+                <DatePicker
+                  id="appliedDate"
+                  selected={parseDate(formData?.appliedDate)}
+                  onChange={(date) =>
+                    handleChange(
+                      "appliedDate",
+                      date ? date.toISOString().slice(0, 10) : ""
+                    )
+                  }
+                  className="bg-light text-primary w-full px-3 py-2 border rounded text-center"
+                  placeholderText="Select date"
+                  dateFormat="dd-MM-yyyy"
+                  wrapperClassName="w-full"
+                  showPopperArrow={false}
+                  maxDate={new Date()}
+                />
+              </div>
 
               <label
                 htmlFor="notes"
@@ -205,7 +215,7 @@ export default function JobModal({
                 value={formData?.notes || ""}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
                 className="bg-light text-primary w-full mb-3 px-3 py-2 border rounded resize-y min-h-[80px] text-center"
-                placeholder="Add notes about the job"
+                placeholder="Any relevant notes go here..."
               />
 
               <div className="flex justify-end gap-3 mt-4">
