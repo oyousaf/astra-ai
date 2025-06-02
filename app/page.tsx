@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-[#d8b4fe] via-accent/40 to-[#facc15]/20">
+    <main className="flex flex-col px-4 sm:px-8 mx-auto items-center justify-center min-h-screen bg-gradient-to-br from-[#d8b4fe] via-accent/40 to-[#facc15]/20">
       <Image
         src="/logo.svg"
         alt="Astra AI Logo"
