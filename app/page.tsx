@@ -26,12 +26,12 @@ export default function HomePage() {
       </p>
       <div className="flex gap-4 mb-10">
         <Link href="/login">
-          <button className="px-6 py-2 rounded-xl bg-primary text-white font-bold shadow hover:bg-secondary transition cursor-pointer">
+          <button className="px-6 py-2 rounded-xl bg-violet-700 hover:bg-violet-600 text-white font-bold shadow transition cursor-pointer">
             Log In
           </button>
         </Link>
         <Link href="/register">
-          <button className="px-6 py-2 rounded-xl border border-secondary text-white font-bold shadow hover:bg-[#7c3aed]/10 transition cursor-pointer">
+          <button className="px-6 py-2 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-bold shadow transition cursor-pointer">
             Register
           </button>
         </Link>
