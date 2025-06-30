@@ -4,7 +4,10 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { validateEmail } from "@/lib/utils";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== "POST") return res.status(405).end();
 
   const { email, password } = req.body;
@@ -28,7 +31,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       data: { email, password: hashed },
     });
 
-    const { password: _, ...safeUser } = user;
+    const { password: _ignored, ...safeUser } = user;
+
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET!, {
       expiresIn: "1d",
     });
