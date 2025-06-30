@@ -12,8 +12,3 @@ export function debounce<T extends (...args: unknown[]) => void>(
     timeout = setTimeout(() => func(...args), wait);
   };
 }
-
-export function validateEmail(email: string) {
-  const regex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
-  return regex.test(email);
-}
