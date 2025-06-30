@@ -1,32 +1,17 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
+const { supabase } = require('../lib/supabaseClient');
 
-const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
+exports.login = async (req, res) => {
+  const { email } = req.body;
 
-export const register = async (req, res) => {
-  const { email, password } = req.body;
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) return res.status(400).json({ error: 'User already exists' });
+  const { data: user, error } = await supabase
+    .from('user')
+    .select('*')
+    .eq('email', email)
+    .single();
 
-  const hashed = await bcrypt.hash(password, 10);
-  const user = await prisma.user.create({
-    data: { email, password: hashed },
-  });
+  if (error || !user) {
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
 
-  const token = jwt.sign({ userId: user.id }, JWT_SECRET);
-  res.json({ token });
-};
-
-export const login = async (req, res) => {
-  const { email, password } = req.body;
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) return res.status(400).json({ error: 'Invalid credentials' });
-
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(400).json({ error: 'Invalid credentials' });
-
-  const token = jwt.sign({ userId: user.id }, JWT_SECRET);
-  res.json({ token });
+  return res.json(user);
 };
