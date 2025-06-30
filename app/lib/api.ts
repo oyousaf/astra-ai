@@ -1,8 +1,7 @@
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000",
-});
+// ✅ Use relative paths so it works in both dev and production
+const api = axios.create();
 
 interface JobData {
   title: string;
@@ -12,38 +11,42 @@ interface JobData {
   notes?: string;
 }
 
+// ✅ AUTH ROUTES
+
 export async function registerUser(email: string, password: string) {
-  return api.post("/auth/register", { email, password });
+  return api.post("/api/auth/register", { email, password });
 }
 
 export async function loginUser(email: string, password: string) {
-  return api.post("/auth/login", { email, password });
+  return api.post("/api/auth/login", { email, password });
 }
 
+// ✅ JOB ROUTES
+
 export async function fetchJobs(token: string) {
-  return api.get("/jobs", {
+  return api.get("/api/jobs", {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
 
 export async function createJob(token: string, jobData: JobData) {
-  return api.post("/jobs", jobData, {
+  return api.post("/api/jobs", jobData, {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
 
 export async function updateJob(
   token: string,
-  jobId: number,
+  jobId: string,
   jobData: Partial<JobData>
 ) {
-  return api.put(`/jobs/${jobId}`, jobData, {
+  return api.patch(`/api/jobs/${jobId}`, jobData, {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
 
-export async function deleteJob(token: string, jobId: number) {
-  return api.delete(`/jobs/${jobId}`, {
+export async function deleteJob(token: string, jobId: string) {
+  return api.delete(`/api/jobs/${jobId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
