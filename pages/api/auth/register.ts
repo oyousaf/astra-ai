@@ -31,7 +31,8 @@ export default async function handler(
       data: { email, password: hashed },
     });
 
-    const { password: _ignored, ...safeUser } = user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...safeUser } = user;
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET!, {
       expiresIn: "1d",
