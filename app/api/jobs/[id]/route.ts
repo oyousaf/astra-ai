@@ -1,42 +1,33 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PUT(
+export async function POST(
   req: NextRequest,
-  context: { params: Record<string, string> }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = context.params;
-  const jobData = await req.json();
+  const jobId = parseInt(params.id);
+  const body = await req.json();
+
+  const { method, ...jobData } = body;
 
   try {
-    const job = await prisma.job.update({
-      where: { id: parseInt(id) },
-      data: jobData,
-    });
-    return NextResponse.json(job);
-  } catch {
-    return NextResponse.json(
-      { error: "Failed to update job" },
-      { status: 500 }
-    );
-  }
-}
+    if (method === "UPDATE") {
+      const updatedJob = await prisma.job.update({
+        where: { id: jobId },
+        data: jobData,
+      });
+      return NextResponse.json(updatedJob);
+    }
 
-export async function DELETE(
-  req: NextRequest,
-  context: { params: Record<string, string> }
-) {
-  const { id } = context.params;
+    if (method === "DELETE") {
+      await prisma.job.delete({
+        where: { id: jobId },
+      });
+      return NextResponse.json({ message: "Job deleted" });
+    }
 
-  try {
-    await prisma.job.delete({
-      where: { id: parseInt(id) },
-    });
-    return NextResponse.json({ message: "Job deleted" });
+    return NextResponse.json({ error: "Unsupported method" }, { status: 400 });
   } catch {
-    return NextResponse.json(
-      { error: "Failed to delete job" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
