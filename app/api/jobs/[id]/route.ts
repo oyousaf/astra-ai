@@ -1,10 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PUT(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
+type Context = {
+  params: {
+    id: string;
+  };
+};
+
+export async function PUT(req: NextRequest, context: Context) {
   const jobData = await req.json();
   const jobId = parseInt(context.params.id);
   try {
@@ -21,10 +24,7 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, context: Context) {
   const jobId = parseInt(context.params.id);
   try {
     await prisma.job.delete({ where: { id: jobId } });
