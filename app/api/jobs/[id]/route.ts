@@ -1,18 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-type Context = {
-  params: {
-    id: string;
-  };
-};
-
-export async function PUT(req: NextRequest, context: Context) {
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const jobData = await req.json();
-  const jobId = parseInt(context.params.id);
   try {
     const job = await prisma.job.update({
-      where: { id: jobId },
+      where: { id: parseInt(params.id) },
       data: jobData,
     });
     return NextResponse.json(job);
@@ -24,10 +20,14 @@ export async function PUT(req: NextRequest, context: Context) {
   }
 }
 
-export async function DELETE(req: NextRequest, context: Context) {
-  const jobId = parseInt(context.params.id);
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    await prisma.job.delete({ where: { id: jobId } });
+    await prisma.job.delete({
+      where: { id: parseInt(params.id) },
+    });
     return NextResponse.json({ message: "Job deleted" });
   } catch {
     return NextResponse.json(
