@@ -3,12 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   const jobData = await req.json();
+  const jobId = parseInt(context.params.id);
   try {
     const job = await prisma.job.update({
-      where: { id: parseInt(params.id) },
+      where: { id: jobId },
       data: jobData,
     });
     return NextResponse.json(job);
@@ -22,10 +23,11 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
+  const jobId = parseInt(context.params.id);
   try {
-    await prisma.job.delete({ where: { id: parseInt(params.id) } });
+    await prisma.job.delete({ where: { id: jobId } });
     return NextResponse.json({ message: "Job deleted" });
   } catch {
     return NextResponse.json(
