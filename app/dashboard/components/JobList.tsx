@@ -16,6 +16,8 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function JobList() {
   const { user } = useAuth();
@@ -26,7 +28,6 @@ export default function JobList() {
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Setup Supabase client with required env vars
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -102,6 +103,7 @@ export default function JobList() {
   return (
     <div className="space-y-6 font-quirky">
       <JobForm onAdd={handleAdd} />
+
       <div className="flex items-center gap-4 bg-light px-4 py-2 rounded-xl text-center justify-center">
         <span className="font-semibold text-primary">Filter by status:</span>
         <Select value={filter} onValueChange={setFilter}>
@@ -119,19 +121,32 @@ export default function JobList() {
           </SelectContent>
         </Select>
       </div>
-      <div className="grid md:grid-cols-2 gap-4">
-        {filteredJobs.map((job) => (
-          <JobCard
-            key={job.id}
-            job={job}
-            onEdit={() => {
-              setEditingJob(job);
-              setSelectedJob(job);
-            }}
-            onDelete={handleDelete}
-          />
-        ))}
-      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-8">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+          >
+            <Loader2 className="w-8 h-8 text-accent" />
+          </motion.div>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 gap-4">
+          {filteredJobs.map((job) => (
+            <JobCard
+              key={job.id}
+              job={job}
+              onEdit={() => {
+                setEditingJob(job);
+                setSelectedJob(job);
+              }}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
+      )}
+
       <JobModal
         isOpen={!!selectedJob}
         onClose={() => {
