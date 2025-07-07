@@ -39,7 +39,7 @@ export default function JobList() {
       setToken(data.session?.access_token ?? null);
     };
     getToken();
-  }, [user]);
+  }, [user, supabase.auth]);
 
   useEffect(() => {
     if (!token) return;
