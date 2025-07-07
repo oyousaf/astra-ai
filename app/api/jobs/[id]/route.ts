@@ -1,33 +1,72 @@
-import { prisma } from "@/lib/prisma";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const jobId = parseInt(params.id);
-  const body = await req.json();
+function getJobIdFromParams(req: NextRequest): number {
+  const idStr = req.nextUrl.pathname.split("/").pop();
+  return idStr ? parseInt(idStr) : NaN;
+}
 
-  const { method, ...jobData } = body;
+export async function PUT(req: NextRequest) {
+  const jobId = getJobIdFromParams(req);
+  const cookieStore = cookies();
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
-  try {
-    if (method === "UPDATE") {
-      const updatedJob = await prisma.job.update({
-        where: { id: jobId },
-        data: jobData,
-      });
-      return NextResponse.json(updatedJob);
-    }
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-    if (method === "DELETE") {
-      await prisma.job.delete({
-        where: { id: jobId },
-      });
-      return NextResponse.json({ message: "Job deleted" });
-    }
-
-    return NextResponse.json({ error: "Unsupported method" }, { status: 400 });
-  } catch {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  if (!user || isNaN(jobId)) {
+    return NextResponse.json(
+      { error: "Unauthorized or invalid ID" },
+      { status: 400 }
+    );
   }
+
+  const body = await req.json();
+  body.updatedAt = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("Job")
+    .update(body)
+    .eq("id", jobId)
+    .eq("userId", user.id)
+    .select();
+
+  if (error || !data.length) {
+    return NextResponse.json(
+      { error: error?.message || "Update failed" },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json({ job: data[0] }, { status: 200 });
+}
+
+export async function DELETE(req: NextRequest) {
+  const jobId = getJobIdFromParams(req);
+  const cookieStore = cookies();
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || isNaN(jobId)) {
+    return NextResponse.json(
+      { error: "Unauthorized or invalid ID" },
+      { status: 400 }
+    );
+  }
+
+  const { error } = await supabase
+    .from("Job")
+    .delete()
+    .eq("id", jobId)
+    .eq("userId", user.id);
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true }, { status: 200 });
 }

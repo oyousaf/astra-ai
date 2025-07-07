@@ -14,11 +14,12 @@ import JobModal from "./JobModal";
 import { Job } from "@/types";
 import { toast } from "sonner";
 import { fetchJobs, createJob, updateJob, deleteJob } from "../../lib/api";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "@/app/context/AuthContext";
+import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 
 export default function JobList() {
-  const { token } = useAuth();
-
+  const { user } = useAuth();
+  const [token, setToken] = useState<string | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [filter, setFilter] = useState<Job["status"] | "All">("All");
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
@@ -26,10 +27,19 @@ export default function JobList() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const getToken = async () => {
+      const session = await createPagesBrowserClient().auth.getSession();
+      setToken(session.data.session?.access_token ?? null);
+    };
+
+    getToken();
+  }, [user]);
+
+  useEffect(() => {
     if (!token) return;
     setLoading(true);
     fetchJobs(token)
-      .then((res) => setJobs(res.data))
+      .then((res) => setJobs(res.jobs || []))
       .catch(() => {
         toast.error("Failed to load jobs");
         setJobs([]);
@@ -48,23 +58,11 @@ export default function JobList() {
         appliedDate: new Date(job.appliedDate).toISOString(),
       };
       const res = await createJob(token, payload);
-      setJobs((prev) => [res.data, ...prev]);
-    } catch (error: unknown) {
-      if (
-        error &&
-        typeof error === "object" &&
-        "response" in error &&
-        (error as { response?: { data?: { message?: string } } }).response?.data
-          ?.message
-      ) {
-        toast.error(
-          (error as { response: { data: { message: string } } }).response.data
-            .message
-        );
-      } else {
-        toast.error("Failed to add job");
-      }
+      setJobs((prev) => [res.job, ...prev]);
+      toast.success("🎉 Job added!");
+    } catch (error) {
       console.error("Add job error:", error);
+      toast.error("Failed to add job");
     }
   };
 
@@ -73,7 +71,7 @@ export default function JobList() {
     try {
       const res = await updateJob(token, updatedJob.id, updatedJob);
       setJobs((prev) =>
-        prev.map((job) => (job.id === updatedJob.id ? res.data : job))
+        prev.map((job) => (job.id === updatedJob.id ? res.job : job))
       );
       toast.success("✨ Job updated!");
       setEditingJob(null);
@@ -105,10 +103,7 @@ export default function JobList() {
     <div className="space-y-6 font-quirky">
       <JobForm onAdd={handleAdd} />
 
-      <div
-        className="flex items-center gap-4 bg-light px-4 py-2 rounded-xl text-center justify-center"
-        aria-label="Job status filter"
-      >
+      <div className="flex items-center gap-4 bg-light px-4 py-2 rounded-xl text-center justify-center">
         <span className="font-semibold text-primary">Filter by status:</span>
         <Select value={filter} onValueChange={setFilter}>
           <SelectTrigger className="w-[180px] border-primary focus:ring-accent">

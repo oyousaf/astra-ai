@@ -9,17 +9,20 @@ export default function ProtectedRoute({
 }: {
   children: React.ReactNode;
 }) {
-  const { token, isLoaded } = useAuth();
+  const { user, isLoaded } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoaded && !token) {
+    if (isLoaded && !user) {
       router.replace("/login");
     }
-  }, [token, isLoaded, router]);
+  }, [user, isLoaded]);
 
-  if (!isLoaded) return null;
-  if (!token) return null;
+  // ⏳ Show loading state until auth is hydrated
+  if (!isLoaded) return <p>Loading...</p>;
+
+  // ⛔ Block render during redirect
+  if (!user) return null;
 
   return <>{children}</>;
 }

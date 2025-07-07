@@ -1,15 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { registerUser } from "../lib/api";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import AuthLayout from "../components/AuthLayout";
 import { toast } from "sonner";
-import { ApiError } from "@/types";
 
 export default function RegisterPage() {
-  const { login } = useAuth();
+  const { register, user, isLoaded } = useAuth();
   const router = useRouter();
 
   const [email, setEmail] = useState("");
@@ -18,23 +16,22 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (isLoaded && user) {
+      router.replace("/dashboard");
+    }
+  }, [user, isLoaded]);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      const res = await registerUser(email, password);
-      login(res.data.token);
+      await register(email, password);
       toast.success("🎉 Registration successful! Welcome aboard!");
-      router.push("/dashboard");
-    } catch (err: unknown) {
+    } catch (err) {
       const message =
-        err &&
-        typeof err === "object" &&
-        "response" in err &&
-        (err as ApiError).response?.data?.error
-          ? (err as ApiError).response!.data!.error!
-          : "Registration failed";
+        err instanceof Error ? err.message : "Registration failed";
       setError(message);
       toast.error(message);
     } finally {
@@ -59,7 +56,7 @@ export default function RegisterPage() {
           placeholder="Email"
           autoComplete="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value.trim())}
           required
           className="w-full p-2 border rounded-xl text-center focus:outline-none focus:ring-2 focus:ring-accent"
         />

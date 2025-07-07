@@ -3,48 +3,71 @@
 import React, {
   createContext,
   useContext,
+  useEffect,
   useState,
   ReactNode,
-  useEffect,
 } from "react";
+import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
+import type { User } from "@supabase/supabase-js";
 
 interface AuthContextType {
-  token: string | null;
-  login: (token: string) => void;
-  logout: () => void;
-  isLoaded: boolean; 
+  user: User | null;
+  isLoaded: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  register: (email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const supabase = createPagesBrowserClient();
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedToken = localStorage.getItem("token");
-      if (storedToken) setToken(storedToken);
+    const getSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data?.session?.user) setUser(data.session.user);
       setIsLoaded(true);
-    }
+    };
+
+    getSession();
+
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
-  const login = (newToken: string) => {
-    setToken(newToken);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("token", newToken);
-    }
+  const login = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw new Error(error.message);
+    setUser(data.user);
   };
 
-  const logout = () => {
-    setToken(null);
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("token");
-    }
+  const logout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  };
+
+  const register = async (email: string, password: string) => {
+    console.log({ email, password });
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) throw new Error(error.message);
+    setUser(data.user);
   };
 
   return (
-    <AuthContext.Provider value={{ token, login, logout, isLoaded }}>
+    <AuthContext.Provider value={{ user, isLoaded, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { loginUser } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import AuthLayout from "../components/AuthLayout";
@@ -23,8 +22,7 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      const res = await loginUser(email, password);
-      login(res.data.token);
+      await login(email, password);
       toast.success("🎉 Welcome back!");
       router.push("/dashboard");
     } catch (err: unknown) {
@@ -34,7 +32,7 @@ export default function LoginPage() {
         "response" in err &&
         (err as ApiError).response?.data?.error
           ? (err as ApiError).response!.data!.error!
-          : "Login failed";
+          : (err as Error).message || "Login failed";
       setError(message);
       toast.error(message);
     } finally {

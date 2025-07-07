@@ -1,10 +1,4 @@
-import axios from "axios";
-
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000",
-});
-
-interface JobData {
+export interface JobData {
   title: string;
   company: string;
   status: string;
@@ -12,40 +6,77 @@ interface JobData {
   notes?: string;
 }
 
-export async function registerUser(email: string, password: string) {
-  return api.post("/auth/register", { email, password });
-}
-
-export async function loginUser(email: string, password: string) {
-  return api.post("/auth/login", { email, password });
-}
-
+// 📥 Fetch all jobs (authenticated)
 export async function fetchJobs(token: string) {
-  return api.get("/jobs", {
-    headers: { Authorization: `Bearer ${token}` },
+  const res = await fetch("/api/jobs", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
+
+  if (!res.ok) {
+    const { error } = await res.json();
+    throw new Error(error || "Failed to fetch jobs");
+  }
+
+  return res.json();
 }
 
+// ➕ Create a new job
 export async function createJob(token: string, jobData: JobData) {
-  return api.post("/jobs", jobData, {
-    headers: { Authorization: `Bearer ${token}` },
+  const res = await fetch("/api/jobs", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(jobData),
   });
+
+  if (!res.ok) {
+    const { error } = await res.json();
+    throw new Error(error || "Failed to create job");
+  }
+
+  return res.json();
 }
 
+// ✏️ Update a job
 export async function updateJob(
   token: string,
   jobId: number,
   jobData: Partial<JobData>
 ) {
-  return api.put(`/jobs/${jobId}`, jobData, {
-    headers: { Authorization: `Bearer ${token}` },
+  const res = await fetch(`/api/jobs/${jobId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(jobData),
   });
+
+  if (!res.ok) {
+    const { error } = await res.json();
+    throw new Error(error || "Failed to update job");
+  }
+
+  return res.json();
 }
 
+// ❌ Delete a job
 export async function deleteJob(token: string, jobId: number) {
-  return api.delete(`/jobs/${jobId}`, {
-    headers: { Authorization: `Bearer ${token}` },
+  const res = await fetch(`/api/jobs/${jobId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
-}
 
-export default api;
+  if (!res.ok) {
+    const { error } = await res.json();
+    throw new Error(error || "Failed to delete job");
+  }
+
+  return res.json();
+}
