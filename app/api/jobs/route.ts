@@ -1,10 +1,23 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+function createSupabaseClient(req: NextRequest) {
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get: (key) => req.cookies.get(key)?.value,
+        set: () => {},
+        remove: () => {},
+      },
+    }
+  );
+}
+
+export async function GET(req: NextRequest) {
+  const supabase = createSupabaseClient(req);
 
   const { data, error } = await supabase
     .from("Job")
@@ -18,17 +31,8 @@ export async function GET() {
   return NextResponse.json({ jobs: data }, { status: 200 });
 }
 
-export async function POST(req: Request) {
-  const supabase = createRouteHandlerClient({
-    cookies: async () => await cookies(),
-  });
-
-  const body = await req.json();
-  const { title, company, status, appliedDate, notes } = body;
-
-  const now = new Date().toISOString();
-
-  // ✅ Get the current user
+export async function POST(req: NextRequest) {
+  const supabase = createSupabaseClient(req);
   const {
     data: { user },
     error: userError,
@@ -37,6 +41,11 @@ export async function POST(req: Request) {
   if (userError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const body = await req.json();
+  const { title, company, status, appliedDate, notes } = body;
+
+  const now = new Date().toISOString();
 
   const { data, error } = await supabase
     .from("Job")
@@ -52,12 +61,12 @@ export async function POST(req: Request) {
         updatedAt: now,
       },
     ])
-    .select();
+    .select()
+    .single();
 
   if (error) {
-    console.error("Supabase insert error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ job: data[0] }, { status: 200 });
+  return NextResponse.json({ job: data }, { status: 200 });
 }

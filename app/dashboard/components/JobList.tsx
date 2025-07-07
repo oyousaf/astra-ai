@@ -1,8 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import JobCard from "./JobCard";
 import JobForm from "./JobForm";
+import JobModal from "./JobModal";
+import { toast } from "sonner";
+import { createBrowserClient } from "@supabase/ssr";
+import { useAuth } from "@/app/context/AuthContext";
+import { fetchJobs, createJob, updateJob, deleteJob } from "@/app/lib/api";
+import type { Job } from "@/types";
 import {
   Select,
   SelectTrigger,
@@ -10,12 +16,6 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import JobModal from "./JobModal";
-import { Job } from "@/types";
-import { toast } from "sonner";
-import { fetchJobs, createJob, updateJob, deleteJob } from "../../lib/api";
-import { useAuth } from "@/app/context/AuthContext";
-import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 
 export default function JobList() {
   const { user } = useAuth();
@@ -26,12 +26,17 @@ export default function JobList() {
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // ✅ Setup Supabase client with required env vars
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
   useEffect(() => {
     const getToken = async () => {
-      const session = await createPagesBrowserClient().auth.getSession();
-      setToken(session.data.session?.access_token ?? null);
+      const { data } = await supabase.auth.getSession();
+      setToken(data.session?.access_token ?? null);
     };
-
     getToken();
   }, [user]);
 
@@ -60,19 +65,16 @@ export default function JobList() {
       const res = await createJob(token, payload);
       setJobs((prev) => [res.job, ...prev]);
       toast.success("🎉 Job added!");
-    } catch (error) {
-      console.error("Add job error:", error);
+    } catch {
       toast.error("Failed to add job");
     }
   };
 
-  const handleUpdate = async (updatedJob: Job) => {
+  const handleUpdate = async (job: Job) => {
     if (!token) return;
     try {
-      const res = await updateJob(token, updatedJob.id, updatedJob);
-      setJobs((prev) =>
-        prev.map((job) => (job.id === updatedJob.id ? res.job : job))
-      );
+      const res = await updateJob(token, job.id, job);
+      setJobs((prev) => prev.map((j) => (j.id === job.id ? res.job : j)));
       toast.success("✨ Job updated!");
       setEditingJob(null);
       setSelectedJob(null);
@@ -85,24 +87,21 @@ export default function JobList() {
     if (!token) return;
     try {
       await deleteJob(token, id);
-      setJobs((prev) => prev.filter((job) => job.id !== id));
+      setJobs((prev) => prev.filter((j) => j.id !== id));
       toast.success("🗑️ Job deleted!");
-      setSelectedJob(null);
       setEditingJob(null);
+      setSelectedJob(null);
     } catch {
       toast.error("Failed to delete job");
     }
   };
 
   const filteredJobs =
-    filter === "All" ? jobs : jobs.filter((job) => job.status === filter);
-
-  if (loading) return <p>Loading jobs...</p>;
+    filter === "All" ? jobs : jobs.filter((j) => j.status === filter);
 
   return (
     <div className="space-y-6 font-quirky">
       <JobForm onAdd={handleAdd} />
-
       <div className="flex items-center gap-4 bg-light px-4 py-2 rounded-xl text-center justify-center">
         <span className="font-semibold text-primary">Filter by status:</span>
         <Select value={filter} onValueChange={setFilter}>
@@ -110,21 +109,22 @@ export default function JobList() {
             <SelectValue placeholder="All" />
           </SelectTrigger>
           <SelectContent className="bg-light text-primary rounded-xl shadow-xl">
-            <SelectItem value="All">All</SelectItem>
-            <SelectItem value="Applied">Applied</SelectItem>
-            <SelectItem value="Interviewing">Interviewing</SelectItem>
-            <SelectItem value="Offer">Offer</SelectItem>
-            <SelectItem value="Rejected">Rejected</SelectItem>
+            {["All", "Applied", "Interviewing", "Offer", "Rejected"].map(
+              (s) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              )
+            )}
           </SelectContent>
         </Select>
       </div>
-
       <div className="grid md:grid-cols-2 gap-4">
         {filteredJobs.map((job) => (
           <JobCard
             key={job.id}
             job={job}
-            onEdit={(job) => {
+            onEdit={() => {
               setEditingJob(job);
               setSelectedJob(job);
             }}
@@ -132,7 +132,6 @@ export default function JobList() {
           />
         ))}
       </div>
-
       <JobModal
         isOpen={!!selectedJob}
         onClose={() => {
