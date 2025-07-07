@@ -20,7 +20,7 @@ export default function RegisterPage() {
     if (isLoaded && user) {
       router.replace("/dashboard");
     }
-  }, [user, isLoaded]);
+  }, [user, isLoaded, router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

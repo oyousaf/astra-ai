@@ -16,7 +16,7 @@ export default function ProtectedRoute({
     if (isLoaded && !user) {
       router.replace("/login");
     }
-  }, [user, isLoaded]);
+  }, [user, isLoaded, router]);
 
   // ⏳ Show loading state until auth is hydrated
   if (!isLoaded) return <p>Loading...</p>;
