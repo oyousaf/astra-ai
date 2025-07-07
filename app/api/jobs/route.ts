@@ -1,8 +1,7 @@
-import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 
-function createSupabaseClient(req: NextRequest) {
+async function createSupabaseClient(req: NextRequest) {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -17,7 +16,7 @@ function createSupabaseClient(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const supabase = createSupabaseClient(req);
+  const supabase = await createSupabaseClient(req);
 
   const { data, error } = await supabase
     .from("Job")
@@ -32,7 +31,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = createSupabaseClient(req);
+  const supabase = await createSupabaseClient(req);
+
   const {
     data: { user },
     error: userError,
@@ -44,7 +44,6 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const { title, company, status, appliedDate, notes } = body;
-
   const now = new Date().toISOString();
 
   const { data, error } = await supabase
