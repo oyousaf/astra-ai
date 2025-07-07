@@ -1,6 +1,5 @@
 const { supabase } = require('../lib/supabaseClient');
 
-// Example: Get all jobs for a user
 exports.getJobs = async (req, res) => {
   const userId = req.params.userId;
 
