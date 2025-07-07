@@ -2,14 +2,13 @@ import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 
-function extractJobId(req: NextRequest): number | null {
+const extractJobId = (req: NextRequest) => {
   const id = req.nextUrl.pathname.split("/").pop();
   return id ? Number(id) : null;
-}
+};
 
-async function createSupabaseClient() {
+const getSupabase = async () => {
   const cookieStore = await cookies();
-
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -21,69 +20,65 @@ async function createSupabaseClient() {
       },
     }
   );
-}
+};
 
-export async function PUT(req: NextRequest) {
-  const jobId = extractJobId(req);
-  if (!jobId) {
-    return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });
-  }
-
-  const supabase = await createSupabaseClient();
-
+const getUserOrThrow = async (
+  supabase: ReturnType<typeof createServerClient>
+) => {
   const {
     data: { user },
-    error: userError,
+    error,
   } = await supabase.auth.getUser();
+  if (error || !user) throw new Error("Unauthorized");
+  return user;
+};
 
-  if (userError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export async function PUT(req: NextRequest) {
+  try {
+    const jobId = extractJobId(req);
+    if (!jobId) throw new Error("Invalid job ID");
+
+    const supabase = await getSupabase();
+    const user = await getUserOrThrow(supabase);
+
+    const body = { ...(await req.json()), updatedAt: new Date().toISOString() };
+
+    const { data, error } = await supabase
+      .from("Job")
+      .update(body)
+      .eq("id", jobId)
+      .eq("userId", user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return NextResponse.json({ job: data }, { status: 200 });
+  } catch (err: any) {
+    const status = err.message === "Unauthorized" ? 401 : 400;
+    return NextResponse.json({ error: err.message }, { status });
   }
-
-  const body = await req.json();
-  body.updatedAt = new Date().toISOString();
-
-  const { data, error } = await supabase
-    .from("Job")
-    .update(body)
-    .eq("id", jobId)
-    .eq("userId", user.id)
-    .select()
-    .single();
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ job: data }, { status: 200 });
 }
 
 export async function DELETE(req: NextRequest) {
-  const jobId = extractJobId(req);
-  if (!jobId) {
-    return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });
+  try {
+    const jobId = extractJobId(req);
+    if (!jobId) throw new Error("Invalid job ID");
+
+    const supabase = await getSupabase();
+    const user = await getUserOrThrow(supabase);
+
+    const { error } = await supabase
+      .from("Job")
+      .delete()
+      .eq("id", jobId)
+      .eq("userId", user.id);
+
+    if (error) throw error;
+
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (err: any) {
+    const status = err.message === "Unauthorized" ? 401 : 400;
+    return NextResponse.json({ error: err.message }, { status });
   }
-
-  const supabase = await createSupabaseClient();
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const { error } = await supabase
-    .from("Job")
-    .delete()
-    .eq("id", jobId)
-    .eq("userId", user.id);
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ success: true }, { status: 200 });
 }
