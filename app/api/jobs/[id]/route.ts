@@ -15,11 +15,11 @@ async function createSupabaseClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get: (key) => cookieStore.get(key)?.value,
+        get: (key: string) => cookieStore.get(key)?.value,
         set: () => {},
         remove: () => {},
       },
-    }
+    },
   );
 }
 

@@ -107,7 +107,7 @@ export default function JobList() {
       <div className="flex items-center gap-4 bg-light px-4 py-2 rounded-xl text-center justify-center">
         <span className="font-semibold text-primary">Filter by status:</span>
         <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger className="w-[180px] border-primary focus:ring-accent">
+          <SelectTrigger className="w-45 border-primary focus:ring-accent">
             <SelectValue placeholder="All" />
           </SelectTrigger>
           <SelectContent className="bg-light text-primary rounded-xl shadow-xl">

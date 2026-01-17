@@ -7,11 +7,11 @@ async function createSupabaseClient(req: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get: (key) => req.cookies.get(key)?.value,
+        get: (key: string) => req.cookies.get(key)?.value,
         set: () => {},
         remove: () => {},
       },
-    }
+    },
   );
 }
 
