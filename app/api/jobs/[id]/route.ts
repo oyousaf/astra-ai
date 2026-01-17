@@ -3,8 +3,9 @@ import { createServerClient } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 
 function extractJobId(req: NextRequest): number | null {
-  const id = req.nextUrl.pathname.split("/").pop();
-  return id ? Number(id) : null;
+  const raw = req.nextUrl.pathname.split("/").pop();
+  const id = Number(raw);
+  return Number.isInteger(id) && id > 0 ? id : null;
 }
 
 async function createSupabaseClient() {
@@ -19,7 +20,7 @@ async function createSupabaseClient() {
         set: () => {},
         remove: () => {},
       },
-    },
+    }
   );
 }
 

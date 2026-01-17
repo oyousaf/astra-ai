@@ -52,24 +52,43 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await req.json();
+  let body: {
+    title?: string;
+    company?: string;
+    status?: string;
+    appliedDate?: string;
+    notes?: string;
+  };
+
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
   const { title, company, status, appliedDate, notes } = body;
+
+  if (!title || !company) {
+    return NextResponse.json(
+      { error: "Missing title or company" },
+      { status: 400 },
+    );
+  }
+
   const now = new Date().toISOString();
 
   const { data, error } = await supabase
     .from("Job")
-    .insert([
-      {
-        title,
-        company,
-        status,
-        appliedDate,
-        notes,
-        userId: user.id,
-        createdAt: now,
-        updatedAt: now,
-      },
-    ])
+    .insert({
+      title,
+      company,
+      status,
+      appliedDate,
+      notes,
+      userId: user.id,
+      createdAt: now,
+      updatedAt: now,
+    })
     .select()
     .single();
 
