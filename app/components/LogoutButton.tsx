@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import ConfirmModal from "../components/ConfirmModal";
 
 export default function LogoutButton() {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { toast } from "sonner";
 import { Job } from "@/types";
 import {
@@ -92,7 +92,7 @@ export default function JobForm({ onAdd }: Props) {
           height={window.innerHeight}
           gravity={0.18}
           tweenDuration={1800}
-          className="pointer-events-none fixed inset-0 z-[10000]"
+          className="pointer-events-none fixed inset-0 z-10000"
         />
       )}
 

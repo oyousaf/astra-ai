@@ -16,7 +16,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 export default function JobList() {
   const { token } = useAuth();

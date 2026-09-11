@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { Job } from "@/types";
 import {
   Select,
@@ -27,6 +27,21 @@ const parseDate = (date: string | Date | undefined): Date | null =>
 
 const formatDate = (date: string | Date | undefined) =>
   date ? new Date(date).toLocaleDateString() : "";
+
+const Field = ({
+  label,
+  value,
+  strong,
+}: {
+  label?: string;
+  value: React.ReactNode;
+  strong?: boolean;
+}) => (
+  <p className="mt-2 text-sm text-gray-300 text-center whitespace-pre-wrap">
+    {label && <strong>{label}</strong>}
+    {strong ? <span className="font-semibold">{value}</span> : value}
+  </p>
+);
 
 export default function JobModal({
   isOpen,
@@ -60,21 +75,6 @@ export default function JobModal({
   };
 
   const handleSave = () => formData && onUpdate(formData);
-
-  const Field = ({
-    label,
-    value,
-    strong,
-  }: {
-    label?: string;
-    value: React.ReactNode;
-    strong?: boolean;
-  }) => (
-    <p className="mt-2 text-sm text-gray-300 text-center whitespace-pre-wrap">
-      {label && <strong>{label}</strong>}
-      {strong ? <span className="font-semibold">{value}</span> : value}
-    </p>
-  );
 
   return (
     <AnimatePresence>
@@ -190,7 +190,7 @@ export default function JobModal({
                   onChange={(date) =>
                     handleChange(
                       "appliedDate",
-                      date ? date.toISOString().slice(0, 10) : ""
+                      date ? date.toISOString().slice(0, 10) : "",
                     )
                   }
                   className="bg-light text-primary w-full px-3 py-2 border rounded text-center"
@@ -213,7 +213,7 @@ export default function JobModal({
                 autoComplete="off"
                 value={formData?.notes || ""}
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
-                className="bg-light text-primary w-full mb-3 px-3 py-2 border rounded resize-y min-h-[80px] text-center"
+                className="bg-light text-primary w-full mb-3 px-3 py-2 border rounded resize-y min-h-20 text-center"
                 placeholder="Any relevant notes go here..."
               />
 
