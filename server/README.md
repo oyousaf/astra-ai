@@ -17,6 +17,7 @@ npm run dev            # http://localhost:4000
 ## VPS setup (Ubuntu/Debian, no Docker)
 
 1. **Install Node and Postgres**
+
    ```bash
    sudo apt update
    sudo apt install -y postgresql postgresql-contrib
@@ -27,6 +28,7 @@ npm run dev            # http://localhost:4000
    ```
 
 2. **Create the database and role**
+
    ```bash
    sudo -u postgres psql
    CREATE ROLE astra WITH LOGIN PASSWORD 'CHANGE_ME';
@@ -35,6 +37,7 @@ npm run dev            # http://localhost:4000
    ```
 
 3. **Deploy the app**
+
    ```bash
    git clone <your-repo-url> astra-ai
    cd astra-ai/server
@@ -46,17 +49,43 @@ npm run dev            # http://localhost:4000
    ```
 
 4. **Run under PM2**
+
+   PM2 apps on this VPS are managed from a single shared `/apps/ecosystem.config.cjs`
+   (alongside other apps like `omega`, `ams`, `notes-api`), not a per-project config.
+   Add an entry there:
+
+   ```js
+   {
+     name: "astra-ai-api",
+     cwd: "/apps/astra-ai/server",
+     script: "src/index.js",
+     instances: 1,
+     exec_mode: "fork",
+     env_file: ".env",
+     autorestart: true,
+     max_restarts: 10,
+   },
+   ```
+
+   `cwd` must be an absolute path — `__dirname` resolves relative to where
+   `ecosystem.config.cjs` itself lives (`/apps`), not this project, so a bare
+   `__dirname` breaks the script path.
+
    ```bash
-   pm2 start ecosystem.config.js
+   cd /apps
+   pm2 start ecosystem.config.cjs --only astra-ai-api
    pm2 save
    pm2 startup   # follow the printed instructions to boot on reboot
    ```
 
 5. **Reverse proxy with Nginx** (`/etc/nginx/sites-available/astra-api`):
+
+   Point an `A` record for `astra.kufi.uk` at the VPS's public IP first, then:
+
    ```nginx
    server {
        listen 80;
-       server_name api.yourdomain.com;
+       server_name astra.kufi.uk;
 
        location / {
            proxy_pass http://127.0.0.1:4000;
@@ -67,13 +96,14 @@ npm run dev            # http://localhost:4000
        }
    }
    ```
+
    ```bash
    sudo ln -s /etc/nginx/sites-available/astra-api /etc/nginx/sites-enabled/
    sudo nginx -t && sudo systemctl reload nginx
-   sudo certbot --nginx -d api.yourdomain.com   # TLS
+   sudo certbot --nginx -d astra.kufi.uk   # TLS
    ```
 
-6. Point the frontend's `NEXT_PUBLIC_API_URL` at `https://api.yourdomain.com`.
+6. Point the frontend's `NEXT_PUBLIC_API_URL` at `https://astra.kufi.uk`, and set `CORS_ORIGIN` in `server/.env` to the frontend's real origin (e.g. `https://astra-ai-six.vercel.app`) — not `localhost`.
 
 ## Updating
 
