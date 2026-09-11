@@ -7,11 +7,12 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import { createBrowserClient } from "@supabase/ssr";
-import type { User } from "@supabase/supabase-js";
+
+type AuthUser = { id: number; email: string };
 
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
+  token: string | null;
   isLoaded: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -20,57 +21,68 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const STORAGE_KEY = "astra-auth";
+
+async function authRequest(path: string, email: string, password: string) {
+  const res = await fetch(`${API_URL}/auth/${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || `${path} failed`);
+  }
+
+  return data as { user: AuthUser; token: string };
+}
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
   useEffect(() => {
-    const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data?.session?.user) setUser(data.session.user);
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const stored = JSON.parse(raw) as { user: AuthUser; token: string };
+        setUser(stored.user);
+        setToken(stored.token);
+      }
+    } catch {
+      localStorage.removeItem(STORAGE_KEY);
+    } finally {
       setIsLoaded(true);
-    };
+    }
+  }, []);
 
-    getSession();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [supabase.auth]);
-
-  const login = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw new Error(error.message);
-    setUser(data.user);
+  const persist = (user: AuthUser, token: string) => {
+    setUser(user);
+    setToken(token);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ user, token }));
   };
 
-  const logout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
+  const login = async (email: string, password: string) => {
+    const data = await authRequest("login", email, password);
+    persist(data.user, data.token);
   };
 
   const register = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) throw new Error(error.message);
-    setUser(data.user);
+    const data = await authRequest("register", email, password);
+    persist(data.user, data.token);
+  };
+
+  const logout = async () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem(STORAGE_KEY);
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoaded, login, logout, register }}>
+    <AuthContext.Provider value={{ user, token, isLoaded, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );

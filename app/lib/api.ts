@@ -1,3 +1,5 @@
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export interface JobData {
   title: string;
   company: string;
@@ -8,7 +10,7 @@ export interface JobData {
 
 // 📥 Fetch all jobs (authenticated)
 export async function fetchJobs(token: string) {
-  const res = await fetch("/api/jobs", {
+  const res = await fetch(`${API_URL}/jobs`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -24,7 +26,7 @@ export async function fetchJobs(token: string) {
 
 // ➕ Create a new job
 export async function createJob(token: string, jobData: JobData) {
-  const res = await fetch("/api/jobs", {
+  const res = await fetch(`${API_URL}/jobs`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -47,7 +49,7 @@ export async function updateJob(
   jobId: number,
   jobData: Partial<JobData>
 ) {
-  const res = await fetch(`/api/jobs/${jobId}`, {
+  const res = await fetch(`${API_URL}/jobs/${jobId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -66,7 +68,7 @@ export async function updateJob(
 
 // ❌ Delete a job
 export async function deleteJob(token: string, jobId: number) {
-  const res = await fetch(`/api/jobs/${jobId}`, {
+  const res = await fetch(`${API_URL}/jobs/${jobId}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,

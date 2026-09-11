@@ -21,7 +21,9 @@ Organise every opportunity, keep notes, and never miss a step in your job hunt! 
 - **Frontend:**  
   React (Next.js), TypeScript, Tailwind CSS, Framer Motion, [shadcn/ui](https://ui.shadcn.com/) 🎨
 - **Backend:**  
-  Node.js (Express), TypeScript, Prisma, PostgreSQL ⚙️
+  Standalone Node.js (Express) API in [`server/`](server/README.md), Prisma, PostgreSQL ⚙️
+- **Auth:**  
+  Self-hosted JWT + bcrypt (no third-party auth provider) 🔐
 - **Deployment:**  
-  [Railway](https://railway.app/) (backend & database) 🚂, [Vercel](https://vercel.com/) (frontend) ▲
+  Frontend on Vercel ▲, API + Postgres self-hosted on a plain VPS (PM2 + Nginx) — see [`server/README.md`](server/README.md) for setup.
   

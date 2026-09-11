@@ -5,7 +5,6 @@ import JobCard from "./JobCard";
 import JobForm from "./JobForm";
 import JobModal from "./JobModal";
 import { toast } from "sonner";
-import { createBrowserClient } from "@supabase/ssr";
 import { useAuth } from "@/app/context/AuthContext";
 import { fetchJobs, createJob, updateJob, deleteJob } from "@/app/lib/api";
 import type { Job } from "@/types";
@@ -20,26 +19,12 @@ import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function JobList() {
-  const { user } = useAuth();
-  const [token, setToken] = useState<string | null>(null);
+  const { token } = useAuth();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [filter, setFilter] = useState<Job["status"] | "All">("All");
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
-  useEffect(() => {
-    const getToken = async () => {
-      const { data } = await supabase.auth.getSession();
-      setToken(data.session?.access_token ?? null);
-    };
-    getToken();
-  }, [user, supabase.auth]);
 
   useEffect(() => {
     if (!token) return;
