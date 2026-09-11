@@ -80,48 +80,6 @@
 }
 
 
-/* Utility background colors */
-.bg-secondary {
-  background-color: var(--secondary);
-}
-.bg-light {
-  background-color: var(--light);
-}
-.bg-accent {
-  background-color: var(--accent);
-}
-.bg-yellow {
-  background-color: var(--yellow);
-}
-.bg-primary {
-  background-color: var(--primary);
-}
-
-/* Utility text colors */
-.text-secondary {
-  color: var(--secondary);
-}
-.text-light {
-  color: var(--light);
-}
-.text-accent {
-  color: var(--accent);
-}
-.text-yellow {
-  color: var(--yellow);
-}
-.text-primary {
-  color: var(--primary);
-}
-
-/* Utility border colors */
-.border-secondary {
-  border-color: var(--secondary);
-}
-.border-accent {
-  border-color: var(--accent);
-}
-
 @theme inline {
   --font-quirky: var(--font-quicksand), sans-serif;
 
@@ -149,6 +107,9 @@
 
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+
+  --color-light: var(--light);
+  --color-yellow: var(--yellow);
 
   --color-destructive: var(--destructive);
 

@@ -45,9 +45,14 @@ export default function LoginPage() {
       <form
         name="login"
         onSubmit={handleSubmit}
-        className="space-y-5 text-primary"
+        className="space-y-4 text-primary"
       >
-        <h2 className="text-2xl font-bold text-center">🚪 Login</h2>
+        <div className="text-center mb-2">
+          <h1 className="text-2xl font-extrabold tracking-tight">Log in</h1>
+          <p className="text-sm text-primary/70 mt-1">
+            Welcome back — keep tracking your applications.
+          </p>
+        </div>
 
         {error && <p className="text-red-800 text-sm text-center">{error}</p>}
 
@@ -59,7 +64,7 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full p-2 border rounded-xl text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="input-style text-center"
         />
 
         <div className="relative">
@@ -71,7 +76,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full p-2 border rounded-xl text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="input-style text-center"
           />
           <button
             type="button"
@@ -87,17 +92,17 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full bg-primary text-accent py-2 rounded-xl hover:scale-105 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+          className={`w-full bg-primary text-accent py-2.5 rounded-xl font-bold shadow-md hover:opacity-90 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
             loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Logging in..." : "Log in"}
         </button>
-        <p className="mt-4 text-sm text-center">
+        <p className="text-sm text-center text-primary/70">
           Don&apos;t have an account?{" "}
           <a
             href="/register"
-            className="text-violet-800 underline hover:text-violet-600"
+            className="text-secondary font-semibold underline hover:opacity-80"
           >
             Register here
           </a>

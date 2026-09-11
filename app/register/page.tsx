@@ -44,9 +44,16 @@ export default function RegisterPage() {
       <form
         name="register"
         onSubmit={handleSubmit}
-        className="space-y-5 text-primary"
+        className="space-y-4 text-primary"
       >
-        <h2 className="text-2xl font-bold text-center">📝 Register</h2>
+        <div className="text-center mb-2">
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            Create your account
+          </h1>
+          <p className="text-sm text-primary/70 mt-1">
+            Start tracking your applications in seconds.
+          </p>
+        </div>
 
         {error && <p className="text-red-800 text-sm text-center">{error}</p>}
 
@@ -58,7 +65,7 @@ export default function RegisterPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value.trim())}
           required
-          className="w-full p-2 border rounded-xl text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="input-style text-center"
         />
 
         <div className="relative">
@@ -70,7 +77,7 @@ export default function RegisterPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full p-2 border rounded-xl text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="input-style text-center"
           />
           <button
             type="button"
@@ -86,19 +93,19 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full bg-green-600 text-white py-2 rounded-xl hover:scale-105 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+          className={`w-full bg-secondary text-white py-2.5 rounded-xl font-bold shadow-md hover:opacity-90 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
             loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
           {loading ? "Registering…" : "Register"}
         </button>
-        <p className="mt-4 text-sm text-center">
+        <p className="text-sm text-center text-primary/70">
           Already have an account?{" "}
           <a
             href="/login"
-            className="text-green-800 underline hover:text-green-600"
+            className="text-secondary font-semibold underline hover:opacity-80"
           >
-            Login here
+            Log in here
           </a>
         </p>
       </form>
