@@ -58,7 +58,7 @@ export default function RegisterPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value.trim())}
           required
-          className="w-full p-2 border rounded-xl text-center focus:outline-none focus:ring-2 focus:ring-accent"
+          className="w-full p-2 border rounded-xl text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         />
 
         <div className="relative">
@@ -70,13 +70,14 @@ export default function RegisterPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full p-2 border rounded-xl text-center focus:outline-none focus:ring-2 focus:ring-accent"
+            className="w-full p-2 border rounded-xl text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-2 text-sm text-primary underline cursor-pointer"
-            tabIndex={-1}
+            className="absolute right-3 top-2 text-sm text-primary underline cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
+            aria-pressed={showPassword}
+            aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? "Hide" : "Show"}
           </button>
@@ -85,7 +86,7 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full bg-green-600 text-white py-2 rounded-xl hover:scale-105 transition-all cursor-pointer ${
+          className={`w-full bg-green-600 text-white py-2 rounded-xl hover:scale-105 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
             loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >

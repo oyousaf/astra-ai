@@ -19,7 +19,12 @@ export default function ProtectedRoute({
   }, [user, isLoaded, router]);
 
   // ⏳ Show loading state until auth is hydrated
-  if (!isLoaded) return <p>Loading...</p>;
+  if (!isLoaded)
+    return (
+      <p role="status" className="p-6 text-center">
+        Loading...
+      </p>
+    );
 
   // ⛔ Block render during redirect
   if (!user) return null;

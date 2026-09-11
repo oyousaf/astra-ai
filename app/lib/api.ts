@@ -82,3 +82,22 @@ export async function deleteJob(token: string, jobId: number) {
 
   return res.json();
 }
+
+// ✨ Extract job details from pasted posting text via AI
+export async function extractJobFromText(token: string, text: string) {
+  const res = await fetch(`${API_URL}/ai/extract-job`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ text }),
+  });
+
+  if (!res.ok) {
+    const { error } = await res.json();
+    throw new Error(error || "AI extraction failed");
+  }
+
+  return res.json();
+}

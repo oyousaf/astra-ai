@@ -33,7 +33,7 @@ export default function LogoutButton() {
         whileTap={{ scale: 0.94 }}
         onClick={() => setModalOpen(true)}
         aria-label="Log out"
-        className="bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-700 transition cursor-pointer shadow-md focus:outline-none focus:ring-2 focus:ring-red-400"
+        className="bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-700 transition cursor-pointer shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
       >
         Logout
       </motion.button>

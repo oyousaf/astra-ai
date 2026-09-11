@@ -4,6 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const jobsRoutes = require("./routes/jobs");
+const aiRoutes = require("./routes/ai");
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(express.json());
 app.get("/health", (req, res) => res.status(200).json({ ok: true }));
 app.use("/auth", authRoutes);
 app.use("/jobs", jobsRoutes);
+app.use("/ai", aiRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err);

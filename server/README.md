@@ -8,7 +8,7 @@ Postgres instance installed directly on the box.
 
 ```bash
 cd server
-cp .env.example .env   # fill in DATABASE_URL / JWT_SECRET
+cp .env.example .env   # fill in DATABASE_URL / JWT_SECRET / GEMINI_API_KEY
 npm install
 npm run prisma:migrate # creates the DB schema
 npm run dev            # http://localhost:4000
@@ -43,7 +43,7 @@ npm run dev            # http://localhost:4000
    cd astra-ai/server
    npm ci --omit=dev
    npm install prisma --no-save   # prisma CLI for migrate deploy
-   cp .env.example .env           # set DATABASE_URL, JWT_SECRET, CORS_ORIGIN, PORT
+   cp .env.example .env           # set DATABASE_URL, JWT_SECRET, CORS_ORIGIN, PORT, GEMINI_API_KEY
    npx prisma migrate deploy
    npx prisma generate
    ```

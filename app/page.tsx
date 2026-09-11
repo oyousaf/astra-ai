@@ -3,7 +3,10 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <main className="flex flex-col px-4 sm:px-8 mx-auto items-center justify-center min-h-screen bg-gradient-to-br from-[#d8b4fe] via-accent/40 to-[#facc15]/20">
+    <main
+      id="main"
+      className="flex flex-col px-4 sm:px-8 mx-auto items-center justify-center min-h-screen bg-linear-to-br from-[#d8b4fe] via-accent/40 to-[#facc15]/20"
+    >
       <Image
         src="/logo.svg"
         alt="Astra AI Logo"
@@ -26,12 +29,12 @@ export default function HomePage() {
       </p>
       <div className="flex gap-4 mb-10">
         <Link href="/login">
-          <button className="px-6 py-2 rounded-xl bg-violet-700 hover:bg-violet-600 text-white font-bold shadow transition cursor-pointer">
+          <button className="px-6 py-2 rounded-xl bg-primary hover:opacity-90 text-accent font-bold shadow transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
             Log In
           </button>
         </Link>
         <Link href="/register">
-          <button className="px-6 py-2 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-bold shadow transition cursor-pointer">
+          <button className="px-6 py-2 rounded-xl bg-secondary hover:opacity-90 text-white font-bold shadow transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
             Register
           </button>
         </Link>

@@ -14,12 +14,16 @@ import {
 import DatePicker from "react-datepicker";
 import Confetti from "react-confetti";
 import "react-datepicker/dist/react-datepicker.css";
+import { Sparkles, Loader2 } from "lucide-react";
+import { useAuth } from "@/app/context/AuthContext";
+import { extractJobFromText } from "@/app/lib/api";
 
 type Props = {
   onAdd?: (job: Job) => void;
 };
 
 export default function JobForm({ onAdd }: Props) {
+  const { token } = useAuth();
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
   const [status, setStatus] = useState("Applied");
@@ -27,7 +31,33 @@ export default function JobForm({ onAdd }: Props) {
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [confetti, setConfetti] = useState(false);
+  const [showPaste, setShowPaste] = useState(false);
+  const [pasteText, setPasteText] = useState("");
+  const [extracting, setExtracting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+
+  const handleExtract = async () => {
+    if (!token || !pasteText.trim()) return;
+    setExtracting(true);
+    try {
+      const { job } = await extractJobFromText(token, pasteText);
+      setTitle(job.title || "");
+      setCompany(job.company || "");
+      setStatus(job.status || "Applied");
+      setNotes(job.notes || "");
+      if (job.appliedDate) {
+        const parsed = new Date(job.appliedDate);
+        if (!Number.isNaN(parsed.getTime())) setAppliedDate(parsed);
+      }
+      toast.success("✨ Extracted! Review the details below before adding.");
+      setPasteText("");
+      setShowPaste(false);
+    } catch {
+      toast.error("Couldn't extract job details — try filling it in manually.");
+    } finally {
+      setExtracting(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,6 +126,62 @@ export default function JobForm({ onAdd }: Props) {
         />
       )}
 
+      <div className="mb-4 text-left">
+        <button
+          type="button"
+          onClick={() => setShowPaste((v) => !v)}
+          className="flex items-center gap-2 text-sm font-semibold text-primary hover:underline cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
+          aria-expanded={showPaste}
+          aria-controls="paste-job-panel"
+        >
+          <Sparkles className="w-4 h-4" aria-hidden="true" />
+          Paste a job posting to autofill
+        </button>
+
+        {showPaste && (
+          <motion.div
+            id="paste-job-panel"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="mt-2 flex flex-col gap-2"
+          >
+            <textarea
+              value={pasteText}
+              onChange={(e) => setPasteText(e.target.value)}
+              placeholder="Paste the full job posting text here…"
+              className="input-style w-full text-left min-h-24"
+              disabled={extracting}
+              aria-label="Job posting text to extract details from"
+            />
+            <button
+              type="button"
+              onClick={handleExtract}
+              disabled={extracting || !pasteText.trim()}
+              className="self-start px-4 py-2 bg-secondary/80 hover:bg-secondary text-white rounded-xl transition-all duration-200 cursor-pointer flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-busy={extracting}
+            >
+              {extracting ? (
+                <>
+                  <motion.span
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                    className="inline-flex"
+                  >
+                    <Loader2 className="w-4 h-4" aria-hidden="true" />
+                  </motion.span>
+                  Extracting…
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" aria-hidden="true" />
+                  Extract with AI
+                </>
+              )}
+            </button>
+          </motion.div>
+        )}
+      </div>
+
       <div className="grid gap-4 md:grid-cols-5 sm:grid-cols-3 items-center text-center justify-center">
         <input
           id="job-title"
@@ -130,7 +216,7 @@ export default function JobForm({ onAdd }: Props) {
           name="status"
           disabled={loading}
         >
-          <SelectTrigger className="w-full border-primary focus:ring-accent bg-light rounded-xl justify-center">
+          <SelectTrigger className="w-full border-primary focus-visible:ring-accent bg-light rounded-xl justify-center">
             <SelectValue placeholder="Select status" />
           </SelectTrigger>
           <SelectContent className="bg-light text-primary rounded-xl shadow-xl">

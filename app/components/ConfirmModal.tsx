@@ -1,5 +1,11 @@
 "use client";
-import { motion, AnimatePresence } from "motion/react";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 type ConfirmModalProps = {
   open: boolean;
@@ -22,46 +28,40 @@ export default function ConfirmModal({
   onCancel,
   loading = false,
 }: ConfirmModalProps) {
-  if (!open) return null;
-
   return (
-    <AnimatePresence>
-      <motion.div
-        className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+    <Dialog open={open} onOpenChange={(next) => !next && onCancel()}>
+      <DialogContent
+        className="max-w-xs bg-light text-primary"
+        showCloseButton={false}
+        aria-describedby={message ? undefined : ""}
       >
-        <motion.div
-          className="bg-light rounded-2xl p-8 max-w-xs w-full shadow-2xl text-center"
-          initial={{ scale: 0.92 }}
-          animate={{ scale: 1 }}
-          exit={{ scale: 0.92 }}
-        >
-          <h2 className="text-xl font-bold mb-2">{title}</h2>
-          {message && <p className="mb-4 text-gray-700">{message}</p>}
-          <div className="flex gap-4 justify-center mt-2">
-            <button
-              className="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition font-semibold cursor-pointer"
-              onClick={onCancel}
-              disabled={loading}
-            >
-              {cancelLabel}
-            </button>
-            <button
-              className={`px-4 py-2 rounded-xl font-semibold transition cursor-pointer ${
-                loading
-                  ? "bg-red-300 cursor-not-allowed"
-                  : "bg-red-600 text-white hover:bg-red-700"
-              }`}
-              onClick={onConfirm}
-              disabled={loading}
-            >
-              {loading ? "Please wait..." : confirmLabel}
-            </button>
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        <DialogTitle className="text-primary">{title}</DialogTitle>
+        {message && (
+          <DialogDescription className="mb-4 text-gray-700">
+            {message}
+          </DialogDescription>
+        )}
+        <div className="flex gap-4 justify-center mt-2">
+          <button
+            className="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition font-semibold cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            onClick={onCancel}
+            disabled={loading}
+          >
+            {cancelLabel}
+          </button>
+          <button
+            className={`px-4 py-2 rounded-xl font-semibold transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+              loading
+                ? "bg-red-300 cursor-not-allowed"
+                : "bg-red-600 text-white hover:bg-red-700"
+            }`}
+            onClick={onConfirm}
+            disabled={loading}
+          >
+            {loading ? "Please wait..." : confirmLabel}
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Job } from "@/types";
 import { motion } from "motion/react";
+import { Pencil, Trash2 } from "lucide-react";
 import ConfirmModal from "../../components/ConfirmModal";
 
 type JobCardProps = {
@@ -108,9 +109,9 @@ export default function JobCard({ job, onEdit, onDelete }: JobCardProps) {
               e.stopPropagation();
               onEdit(job);
             }}
-            className="text-yellow-800 hover:text-yellow-900 transition cursor-pointer"
+            className="text-yellow-800 hover:text-yellow-900 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
           >
-            ✏️
+            <Pencil className="w-4 h-4" aria-hidden="true" />
           </button>
           <button
             aria-label="Delete job"
@@ -118,9 +119,9 @@ export default function JobCard({ job, onEdit, onDelete }: JobCardProps) {
               e.stopPropagation();
               setDeleteOpen(true);
             }}
-            className="text-red-700 hover:text-red-900 transition cursor-pointer"
+            className="text-red-700 hover:text-red-900 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
           >
-            🗑️
+            <Trash2 className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       </motion.div>
