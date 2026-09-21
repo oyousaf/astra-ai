@@ -145,6 +145,35 @@ export default function HomePage() {
             </motion.div>
           ))}
         </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-20 sm:mt-28 flex items-center justify-center gap-1.5 text-sm text-light/60"
+        >
+          <span>Built with</span>
+          <motion.span
+            aria-hidden="true"
+            className="inline-block leading-none"
+            animate={{ rotate: -360 }}
+            transition={{ repeat: Infinity, duration: 7, ease: "linear" }}
+          >
+            💚
+          </motion.span>
+          <span>
+            by{" "}
+            <a
+              href="https://legxcysol.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-light/80 hover:text-light transition-colors"
+            >
+              Legxcy Solutions
+            </a>
+          </span>
+        </motion.div>
       </div>
     </main>
   );
