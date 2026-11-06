@@ -19,7 +19,7 @@ Organise every opportunity, keep notes, and never miss a step in your job hunt! 
 ## Tech Stack 🛠️
 
 - **Frontend:**  
-  React (Next.js), TypeScript, Tailwind CSS, Framer Motion, [shadcn/ui](https://ui.shadcn.com/) 🎨
+  React (Next.js), TypeScript, Tailwind CSS, Motion, [shadcn/ui](https://ui.shadcn.com/) 🎨
 - **Backend:**  
   Standalone Node.js (Express) API in [`server/`](server/README.md), Prisma, PostgreSQL ⚙️
 - **Auth:**  
