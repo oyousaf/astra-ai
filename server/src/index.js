@@ -1,4 +1,6 @@
-require("dotenv").config();
+// override: .env is the source of truth. Without it, stale values inherited from
+// the shell or PM2's saved env silently win (e.g. an old CORS_ORIGIN).
+require("dotenv").config({ override: true });
 
 const express = require("express");
 const cors = require("cors");
