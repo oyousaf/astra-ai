@@ -7,6 +7,8 @@ router.use(requireAuth);
 
 const MAX_INPUT_LENGTH = 6000;
 const AI_TIMEOUT_MS = 25_000;
+// Swappable from .env so a retired or misbehaving model doesn't need a code change.
+const AI_MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
 const STATUS_VALUES = ["Applied", "Interviewing", "Offer", "Rejected"];
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -47,7 +49,7 @@ router.post("/extract-job", async (req, res) => {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
+      model: AI_MODEL,
       contents: `Extract the job application details from this job posting text:\n\n${text}`,
       config: {
         systemInstruction:
