@@ -6,6 +6,7 @@ const router = Router();
 router.use(requireAuth);
 
 const MAX_INPUT_LENGTH = 6000;
+const AI_TIMEOUT_MS = 25_000;
 const STATUS_VALUES = ["Applied", "Interviewing", "Offer", "Rejected"];
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -53,13 +54,16 @@ router.post("/extract-job", async (req, res) => {
           "You extract structured job application data from pasted job postings. Only report information actually present in the text - never invent a company, title, or date. Keep notes factual and brief.",
         responseMimeType: "application/json",
         responseJsonSchema: JOB_SCHEMA,
+        // Fail fast instead of hanging until nginx returns a 504 (60s) or
+        // undici gives up waiting for headers (5 min).
+        httpOptions: { timeout: AI_TIMEOUT_MS },
       },
     });
 
     const job = JSON.parse(response.text);
     return res.status(200).json({ job });
   } catch (err) {
-    console.error(err);
+    console.error("[ai/extract-job]", err?.name, err?.message, err?.cause?.code ?? "");
     return res.status(502).json({ error: "AI extraction failed, try filling in the form manually" });
   }
 });
